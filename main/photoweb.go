@@ -107,12 +107,12 @@ func textJsonReturn(w http.ResponseWriter, r *http.Request) {
 			"Afra",
 			true,
 		}
-		json, err := json.Marshal(me)
+		jsonStr, err := json.Marshal(me)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Write(json)
+		w.Write(jsonStr)
 	}
 }
 
