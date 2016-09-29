@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"path"
+	"encoding/json"
 )
 
 const (
@@ -19,6 +20,12 @@ const (
 
 // 全局变量 templates ， 用于存放所有模板内容
 var templates = make(map[string]*template.Template)
+
+type Man struct {
+	Age int
+	Name string
+	Sex bool
+}
 
 // 初始化，会在 main 函数之前运行, 遍历解析 views 目录下的所有html，存入 templates 切片中
 func init() {
@@ -56,6 +63,9 @@ func main() {
 
 	// localhost:8080/list
 	mux.HandleFunc("/list", safeHandler(listSavedImage))
+
+	// localhost:8080/json
+	mux.HandleFunc("/json", safeHandler(textJsonReturn))
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -67,12 +77,6 @@ func main() {
 func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int) {
 	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
 		file := staticDir + r.URL.Path[len(prefix) - 1:]
-		if (flags & ListDir) == 0 {
-			if exists := os.IsExist(file); !exists {
-				http.NotFound(w, r)
-				return
-			}
-		}
 		http.ServeFile(w, r, file)
 	})
 }
@@ -94,6 +98,22 @@ func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
 func useTemplateFile(w http.ResponseWriter, fileName string, locals map[string]interface{}) (err error) {
 	resultErr := templates[fileName + ".html"].Execute(w, locals)
 	return resultErr
+}
+
+func textJsonReturn(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		me := Man{
+			12,
+			"Afra",
+			true,
+		}
+		json, err := json.Marshal(me)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(json)
+	}
 }
 
 /* 查看单张图片 */
