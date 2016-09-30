@@ -1,20 +1,20 @@
 package main
 
 import (
+	"encoding/json"
+	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"html/template"
-	"io/ioutil"
 	"path"
-	"encoding/json"
 )
 
 const (
-	ListDir = 0x0001
+	ListDir    = 0x0001
 	UPLOAD_DIR = "./uploads"
-	VIEWS_DIR = "./views"
+	VIEWS_DIR  = "./views"
 	STATIC_DIR = "./public"
 )
 
@@ -22,9 +22,9 @@ const (
 var templates = make(map[string]*template.Template)
 
 type Man struct {
-	Age int
+	Age  int
 	Name string
-	Sex bool
+	Sex  bool
 }
 
 // 初始化，会在 main 函数之前运行, 遍历解析 views 目录下的所有html，存入 templates 切片中
@@ -40,7 +40,7 @@ func init() {
 		if ext := path.Ext(fileName); ext != ".html" {
 			continue
 		}
-		filePath = VIEWS_DIR + "/" + fileName;
+		filePath = VIEWS_DIR + "/" + fileName
 		log.Println("loading template : " + filePath)
 		t := template.Must(template.ParseFiles(filePath))
 		templates[fileName] = t
@@ -72,11 +72,10 @@ func main() {
 	}
 }
 
-
 // 用于加载静态变量
 func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int) {
 	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
-		file := staticDir + r.URL.Path[len(prefix) - 1:]
+		file := staticDir + r.URL.Path[len(prefix)-1:]
 		if (flags & ListDir) == 0 {
 			if exists := IsExist(file); !exists {
 				http.NotFound(w, r)
@@ -87,7 +86,7 @@ func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags
 	})
 }
 
-func IsExist(path string) bool{
+func IsExist(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true
@@ -110,7 +109,7 @@ func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
 
 // 公共方法，解析模板文件
 func useTemplateFile(w http.ResponseWriter, fileName string, locals map[string]interface{}) (err error) {
-	resultErr := templates[fileName + ".html"].Execute(w, locals)
+	resultErr := templates[fileName+".html"].Execute(w, locals)
 	return resultErr
 }
 
@@ -167,7 +166,6 @@ func listSavedImage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // 图片上传方法
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -210,6 +208,6 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// 重定向去查看上传的单张图片
-		http.Redirect(w, r, "/view?id=" + fileName, http.StatusFound)
+		http.Redirect(w, r, "/view?id="+fileName, http.StatusFound)
 	}
 }
