@@ -13,9 +13,9 @@ import (
 
 const (
 	ListDir    = 0x0001
-	UPLOAD_DIR = "./uploads"
-	VIEWS_DIR  = "./views"
-	STATIC_DIR = "./public"
+	UPLOAD_DIR = "./src/uploads"
+	VIEWS_DIR  = "./src/views"
+	STATIC_DIR = "./src/public"
 )
 
 // 全局变量 templates ， 用于存放所有模板内容
