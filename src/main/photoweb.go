@@ -207,6 +207,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		log.Printf("A new Picture : %s\n", fileName)
+
 		// 重定向去查看上传的单张图片
 		http.Redirect(w, r, "/view?id="+fileName, http.StatusFound)
 	}
